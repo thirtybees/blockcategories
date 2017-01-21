@@ -12,7 +12,7 @@ function upgrade_module_2_9_1($object)
         $tab = new Tab();
         $tab->active = 1;
         $tab->class_name = 'AdminBlockCategories';
-        $tab->name = array();
+        $tab->name = [];
         foreach (Language::getLanguages(true) as $lang) {
             $tab->name[$lang['id_lang']] = 'BlockCategories';
         }
