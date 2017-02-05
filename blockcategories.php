@@ -161,8 +161,8 @@ class BlockCategories extends Module
      */
     protected function clearBlockcategoriesCache()
     {
-        $this->clearCache('blockcategories.tpl');
-        $this->clearCache('blockcategories_footer.tpl');
+        $this->_clearCache('blockcategories.tpl');
+        $this->_clearCache('blockcategories_footer.tpl');
     }
 
     /**
