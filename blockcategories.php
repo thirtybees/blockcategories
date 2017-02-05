@@ -1,50 +1,65 @@
 <?php
-/*
-* 2007-2016 PrestaShop
-*
-* NOTICE OF LICENSE
-*
-* This source file is subject to the Academic Free License (AFL 3.0)
-* that is bundled with this package in the file LICENSE.txt.
-* It is also available through the world-wide-web at this URL:
-* http://opensource.org/licenses/afl-3.0.php
-* If you did not receive a copy of the license and are unable to
-* obtain it through the world-wide-web, please send an email
-* to license@prestashop.com so we can send you a copy immediately.
-*
-* DISCLAIMER
-*
-* Do not edit or add to this file if you wish to upgrade PrestaShop to newer
-* versions in the future. If you wish to customize PrestaShop for your
-* needs please refer to http://www.prestashop.com for more information.
-*
-*  @author PrestaShop SA <contact@prestashop.com>
-*  @copyright  2007-2016 PrestaShop SA
-*  @license    http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
-*  International Registered Trademark & Property of PrestaShop SA
-*/
+/**
+ * 2007-2016 PrestaShop
+ *
+ * Thirty Bees is an extension to the PrestaShop e-commerce software developed by PrestaShop SA
+ * Copyright (C) 2017 Thirty Bees
+ *
+ * NOTICE OF LICENSE
+ *
+ * This source file is subject to the Academic Free License (AFL 3.0)
+ * that is bundled with this package in the file LICENSE.txt.
+ * It is also available through the world-wide-web at this URL:
+ * http://opensource.org/licenses/afl-3.0.php
+ * If you did not receive a copy of the license and are unable to
+ * obtain it through the world-wide-web, please send an email
+ * to license@thirtybees.com so we can send you a copy immediately.
+ *
+ * @author    Thirty Bees <modules@thirtybees.com>
+ * @author    PrestaShop SA <contact@prestashop.com>
+ * @copyright 2017 Thirty Bees
+ * @copyright 2007-2016 PrestaShop SA
+ * @license   http://opensource.org/licenses/afl-3.0.php  Academic Free License (AFL 3.0)
+ * PrestaShop is an internationally registered trademark & property of PrestaShop SA
+ */
 
-if (!defined('_PS_VERSION_')) {
+if (!defined('_TB_VERSION_')) {
     exit;
 }
 
+/**
+ * Class BlockCategories
+ *
+ * @since 1.0.0
+ */
 class BlockCategories extends Module
 {
+    /**
+     * BlockCategories constructor.
+     *
+     * @since 1.0.0
+     */
     public function __construct()
     {
         $this->name = 'blockcategories';
         $this->tab = 'front_office_features';
-        $this->version = '2.9.4';
-        $this->author = 'PrestaShop';
+        $this->version = '3.0.0';
+        $this->author = 'thirty bees';
 
         $this->bootstrap = true;
         parent::__construct();
 
         $this->displayName = $this->l('Categories block');
         $this->description = $this->l('Adds a block featuring product categories.');
-        $this->ps_versions_compliancy = ['min' => '1.6', 'max' => '1.6.99.99'];
     }
 
+    /**
+     * Install this module
+     *
+     * @return bool Indicates whether this module has been successfully installed
+     *
+     * @since 1.0.0
+     */
     public function install()
     {
         // Prepare tab
@@ -79,12 +94,19 @@ class BlockCategories extends Module
         return true;
     }
 
+    /**
+     * Uninstall this module
+     *
+     * @return bool Indicates whether this module has been successfully uninstalled
+     *
+     * @since 1.0.0
+     */
     public function uninstall()
     {
-        $id_tab = (int) Tab::getIdFromClassName('AdminBlockCategories');
+        $idTab = (int) Tab::getIdFromClassName('AdminBlockCategories');
 
-        if ($id_tab) {
-            $tab = new Tab($id_tab);
+        if ($idTab) {
+            $tab = new Tab($idTab);
             $tab->delete();
         }
 
@@ -99,6 +121,11 @@ class BlockCategories extends Module
         return true;
     }
 
+    /**
+     * @return string
+     *
+     * @since 1.0.0
+     */
     public function getContent()
     {
         $output = '';
@@ -118,7 +145,7 @@ class BlockCategories extends Module
                 Configuration::updateValue('BLOCK_CATEG_SORT', Tools::getValue('BLOCK_CATEG_SORT'));
                 Configuration::updateValue('BLOCK_CATEG_ROOT_CATEGORY', Tools::getValue('BLOCK_CATEG_ROOT_CATEGORY'));
 
-                $this->_clearBlockcategoriesCache();
+                $this->clearBlockcategoriesCache();
 
                 Tools::redirectAdmin(AdminController::$currentIndex.'&configure='.$this->name.'&token='.Tools::getAdminTokenLite('AdminModules').'&conf=6');
             }
@@ -127,15 +154,25 @@ class BlockCategories extends Module
         return $output.$this->renderForm();
     }
 
-    private function _clearBlockcategoriesCache()
+    /**
+     *
+     *
+     * @since 1.0.0
+     */
+    protected function clearBlockcategoriesCache()
     {
-        $this->_clearCache('blockcategories.tpl');
-        $this->_clearCache('blockcategories_footer.tpl');
+        $this->clearCache('blockcategories.tpl');
+        $this->clearCache('blockcategories_footer.tpl');
     }
 
+    /**
+     * @return string
+     *
+     * @since 1.0.0
+     */
     public function renderForm()
     {
-        $fields_form = [
+        $formFields = [
             'form' => [
                 'legend' => [
                     'title' => $this->l('Settings'),
@@ -256,9 +293,14 @@ class BlockCategories extends Module
             'id_language'  => $this->context->language->id,
         ];
 
-        return $helper->generateForm([$fields_form]);
+        return $helper->generateForm([$formFields]);
     }
 
+    /**
+     * @return array
+     *
+     * @since 1.0.0
+     */
     public function getConfigFieldsValues()
     {
         return [
@@ -271,13 +313,20 @@ class BlockCategories extends Module
         ];
     }
 
+    /**
+     * @param array $params
+     *
+     * @return string|null
+     *
+     * @since 1.0.0
+     */
     public function hookDisplayBackOfficeCategory($params)
     {
         $category = new Category((int) Tools::getValue('id_category'));
         $files = [];
 
         if ($category->level_depth < 1) {
-            return;
+            return null;
         }
 
         for ($i = 0; $i < 3; $i++) {
@@ -288,24 +337,28 @@ class BlockCategories extends Module
             }
         }
 
-        $images_types = ImageType::getImagesTypes('categories');
-        $formated_medium = ImageType::getFormatedName('medium');
-        foreach ($images_types as $k => $image_type) {
-            if ($formated_medium == $image_type['name']) {
-                $this->smarty->assign('format', $image_type);
+        $imagesTypes = ImageType::getImagesTypes('categories');
+        $formatedMedium = ImageType::getFormatedName('medium');
+        foreach ($imagesTypes as $k => $imageType) {
+            if ($formatedMedium == $imageType['name']) {
+                $this->smarty->assign('format', $imageType);
             }
         }
 
         $helper = new HelperImageUploader();
-        $helper->setMultiple(true)->setUseAjax(true)->setName('thumbnail')->setFiles($files)->setMaxFiles(3)->setUrl(
-            Context::getContext()->link->getAdminLink('AdminBlockCategories').'&ajax=1&id_category='.$category->id
-            .'&action=uploadThumbnailImages'
-        );
+        $helper->setMultiple(true)->setUseAjax(true)->setName('thumbnail')->setFiles($files)->setMaxFiles(3)->setUrl(Context::getContext()->link->getAdminLink('AdminBlockCategories').'&ajax=1&id_category='.$category->id.'&action=uploadThumbnailImages');
         $this->smarty->assign('helper', $helper->render());
 
         return $this->display(__FILE__, 'views/blockcategories_admin.tpl');
     }
 
+    /**
+     * @param array $params
+     *
+     * @return string
+     *
+     * @since 1.0.0
+     */
     public function hookFooter($params)
     {
         $this->setLastVisitedCategory();
@@ -326,7 +379,7 @@ class BlockCategories extends Module
 				ORDER BY `level_depth` ASC, '.(Configuration::get('BLOCK_CATEG_SORT') ? 'cl.`name`' : 'category_shop.`position`').' '.(Configuration::get('BLOCK_CATEG_SORT_WAY') ? 'DESC' : 'ASC')
             )
             ) {
-                return;
+                return null;
             }
             $resultParents = [];
             $resultIds = [];
@@ -350,9 +403,6 @@ class BlockCategories extends Module
 
             $isDhtml = (Configuration::get('BLOCK_CATEG_DHTML') == 1 ? true : false);
 
-            $id_category = (int) Tools::getValue('id_category');
-            $id_product = (int) Tools::getValue('id_product');
-
             $this->smarty->assign('blockCategTree', $blockCategTree);
 
             if (file_exists(_PS_THEME_DIR_.'modules/blockcategories/blockcategories_footer.tpl')) {
@@ -367,10 +417,15 @@ class BlockCategories extends Module
         return $display;
     }
 
+    /**
+     * @return null
+     *
+     * @since 1.0.0
+     */
     public function setLastVisitedCategory()
     {
-        $cache_id = 'blockcategories::setLastVisitedCategory';
-        if (!Cache::isStored($cache_id)) {
+        $cacheId = 'blockcategories::setLastVisitedCategory';
+        if (!Cache::isStored($cacheId)) {
             if (method_exists($this->context->controller, 'getCategory') && ($category = $this->context->controller->getCategory())) {
                 $this->context->cookie->last_visited_category = $category->id;
             } elseif (method_exists($this->context->controller, 'getProduct') && ($product = $this->context->controller->getProduct())) {
@@ -381,48 +436,66 @@ class BlockCategories extends Module
                     $this->context->cookie->last_visited_category = (int) $product->id_category_default;
                 }
             }
-            Cache::store($cache_id, $this->context->cookie->last_visited_category);
+            Cache::store($cacheId, $this->context->cookie->last_visited_category);
         }
 
-        return Cache::retrieve($cache_id);
+        return Cache::retrieve($cacheId);
     }
 
+    /**
+     * @param string|null $name
+     *
+     * @return string
+     *
+     * @since 1.0.0
+     */
     protected function getCacheId($name = null)
     {
-        $cache_id = parent::getCacheId();
+        $cacheId = parent::getCacheId();
 
         if ($name !== null) {
-            $cache_id .= '|'.$name;
+            $cacheId .= '|'.$name;
         }
 
         if ((Tools::getValue('id_product') || Tools::getValue('id_category')) && isset($this->context->cookie->last_visited_category) && $this->context->cookie->last_visited_category) {
-            $cache_id .= '|'.(int) $this->context->cookie->last_visited_category;
+            $cacheId .= '|'.(int) $this->context->cookie->last_visited_category;
         }
 
-        return $cache_id.'|'.implode('-', Customer::getGroupsStatic($this->context->customer->id));
+        return $cacheId.'|'.implode('-', Customer::getGroupsStatic($this->context->customer->id));
     }
 
-    public function getTree($resultParents, $resultIds, $maxDepth, $id_category = null, $currentDepth = 0)
+    /**
+     * @param array $resultParents
+     * @param array $resultIds
+     * @param int   $maxDepth
+     * @param null  $idCategory
+     * @param int   $currentDepth
+     *
+     * @return array
+     *
+     * @since 1.0.0
+     */
+    public function getTree($resultParents, $resultIds, $maxDepth, $idCategory = null, $currentDepth = 0)
     {
-        if (is_null($id_category)) {
-            $id_category = $this->context->shop->getCategory();
+        if (is_null($idCategory)) {
+            $idCategory = $this->context->shop->getCategory();
         }
         $children = [];
-        if (isset($resultParents[$id_category]) && count($resultParents[$id_category]) && ($maxDepth == 0 || $currentDepth < $maxDepth)) {
-            foreach ($resultParents[$id_category] as $subcat) {
+        if (isset($resultParents[$idCategory]) && count($resultParents[$idCategory]) && ($maxDepth == 0 || $currentDepth < $maxDepth)) {
+            foreach ($resultParents[$idCategory] as $subcat) {
                 $children[] = $this->getTree($resultParents, $resultIds, $maxDepth, $subcat['id_category'], $currentDepth + 1);
             }
         }
-        if (isset($resultIds[$id_category])) {
-            $link = $this->context->link->getCategoryLink($id_category, $resultIds[$id_category]['link_rewrite']);
-            $name = $resultIds[$id_category]['name'];
-            $desc = $resultIds[$id_category]['description'];
+        if (isset($resultIds[$idCategory])) {
+            $link = $this->context->link->getCategoryLink($idCategory, $resultIds[$idCategory]['link_rewrite']);
+            $name = $resultIds[$idCategory]['name'];
+            $desc = $resultIds[$idCategory]['description'];
         } else {
             $link = $name = $desc = '';
         }
 
         $return = [
-            'id'       => $id_category,
+            'id'       => $idCategory,
             'link'     => $link,
             'name'     => $name,
             'desc'     => $desc,
@@ -432,18 +505,28 @@ class BlockCategories extends Module
         return $return;
     }
 
+    /**
+     * @param array $params
+     *
+     * @return string
+     */
     public function hookRightColumn($params)
     {
         return $this->hookLeftColumn($params);
     }
 
+    /**
+     * @param array $params
+     *
+     * @return string
+     */
     public function hookLeftColumn($params)
     {
         $this->setLastVisitedCategory();
         $phpself = $this->context->controller->php_self;
-        $current_allowed_controllers = ['category'];
+        $currentAllowedControllers = ['category'];
 
-        if ($phpself != null && in_array($phpself, $current_allowed_controllers) && Configuration::get('BLOCK_CATEG_ROOT_CATEGORY') && isset($this->context->cookie->last_visited_category) && $this->context->cookie->last_visited_category) {
+        if ($phpself != null && in_array($phpself, $currentAllowedControllers) && Configuration::get('BLOCK_CATEG_ROOT_CATEGORY') && isset($this->context->cookie->last_visited_category) && $this->context->cookie->last_visited_category) {
             $category = new Category($this->context->cookie->last_visited_category, $this->context->language->id);
             if (Configuration::get('BLOCK_CATEG_ROOT_CATEGORY') == 2 && !$category->is_root_category && $category->id_parent) {
                 $category = new Category($category->id_parent, $this->context->language->id);
@@ -511,29 +594,52 @@ class BlockCategories extends Module
         return $this->display(__FILE__, 'blockcategories.tpl', $cacheId);
     }
 
+    /**
+     * @since 1.0.0
+     */
     public function hookHeader()
     {
         $this->context->controller->addJS(_THEME_JS_DIR_.'tools/treeManagement.js');
         $this->context->controller->addCSS(($this->_path).'blockcategories.css', 'all');
     }
 
+    /**
+     * @param array $params
+     *
+     * @since 1.0.0
+     */
     public function hookCategoryAddition($params)
     {
-        $this->_clearBlockcategoriesCache();
+        $this->clearBlockcategoriesCache();
     }
 
+    /**
+     * @param $params
+     *
+     * @since 1.0.0
+     */
     public function hookCategoryUpdate($params)
     {
-        $this->_clearBlockcategoriesCache();
+        $this->clearBlockcategoriesCache();
     }
 
+    /**
+     * @param $params
+     *
+     * @since 1.0.0
+     */
     public function hookCategoryDeletion($params)
     {
-        $this->_clearBlockcategoriesCache();
+        $this->clearBlockcategoriesCache();
     }
 
+    /**
+     * @param $params
+     *
+     * @since 1.0.0
+     */
     public function hookActionAdminMetaControllerUpdate_optionsBefore($params)
     {
-        $this->_clearBlockcategoriesCache();
+        $this->clearBlockcategoriesCache();
     }
 }

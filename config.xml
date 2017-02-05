@@ -2,9 +2,9 @@
 <module>
 	<name>blockcategories</name>
 	<displayName><![CDATA[Categories block]]></displayName>
-	<version><![CDATA[2.9.4]]></version>
+	<version><![CDATA[3.0.0]]></version>
 	<description><![CDATA[Adds a block featuring product categories.]]></description>
-	<author><![CDATA[PrestaShop]]></author>
+	<author><![CDATA[thirty bees]]></author>
 	<tab><![CDATA[front_office_features]]></tab>
 	<is_configurable>1</is_configurable>
 	<need_instance>1</need_instance>
