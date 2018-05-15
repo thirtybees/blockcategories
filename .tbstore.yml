@@ -10,4 +10,5 @@ description_short: The block categories module is a standard module from thirty 
 description: description.md
 images:
   - image-1.png
+gdpr_compliant: true
 license: MIT
