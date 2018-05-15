@@ -49,7 +49,7 @@ class BlockCategories extends Module
         $this->bootstrap = true;
         parent::__construct();
 
-        $this->displayName = $this->l('Categories block');
+        $this->displayName = $this->l('Block Categories');
         $this->description = $this->l('Adds a block featuring product categories.');
     }
 
