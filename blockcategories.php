@@ -53,6 +53,7 @@ class BlockCategories extends Module
         $this->displayName = $this->l('Block Categories');
         $this->description = $this->l('Adds a block featuring product categories.');
         $this->tb_versions_compliancy = '> 1.0.0';
+        $this->tb_min_version = '1.0.0';
     }
 
     /**
